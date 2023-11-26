@@ -25,17 +25,17 @@
         </tr>
         <c:forEach items="${meals}" var="meal">
             <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
-            <tr class="<c:if test="${meal.excess}"> excess </c:if>
-                        <c:if test="${!meal.excess}"> noexcess </c:if>>">
+            <tr class="${meal.excess ? "excess" : "noexcess"}">
                 <td>${meal.date} ${meal.time}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><img src="img/delete.png" height="30" alt="delete"></td>
-                <td><img src="img/edit.png" height="30" alt="edit">
-                </td>
+                <td><a href="meals?id=${meal.id}&action=delete"><img src="img/delete.png" height="30" alt="delete"></a></td>
+                <td><a href="meals?id=${meal.id}&action=edit"><img src="img/edit.png" height="30" alt="edit"></a></td>
             </tr>
         </c:forEach>
     </table>
+    <a href="meals?action=add"><img src="img/add.png" height="30" alt="add"></a><br/><br/>
+    <a href="meals?action=clear"><img src="img/clear.png" height="30" alt="clear"></a>
 </section>
 </body>
 </html>
