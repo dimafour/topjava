@@ -35,7 +35,6 @@
         </c:forEach>
     </table>
     <a href="meals?action=add"><img src="img/add.png" height="30" alt="add"></a><br/><br/>
-    <a href="meals?action=clear"><img src="img/clear.png" height="30" alt="clear"></a>
 </section>
 </body>
 </html>

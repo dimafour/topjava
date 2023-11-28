@@ -6,9 +6,7 @@ import java.util.List;
 
 public interface Storage {
 
-    void clear();
-
-    void save(int id, Meal meal);
+    Meal save(Meal meal);
 
     Meal get(int id);
 
@@ -16,7 +14,4 @@ public interface Storage {
 
     List<Meal> getAll();
 
-    int size();
-
-    void update(Meal meal);
 }

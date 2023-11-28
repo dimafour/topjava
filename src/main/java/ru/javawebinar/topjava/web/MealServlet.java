@@ -3,9 +3,8 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.storage.MapStorage;
+import ru.javawebinar.topjava.storage.MemoryStorage;
 import ru.javawebinar.topjava.storage.Storage;
-import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,73 +20,68 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static ru.javawebinar.topjava.util.MealsUtil.*;
 
 public class MealServlet extends HttpServlet {
-    private final Storage storage = new MapStorage(MEALS);
-    private static final Logger log = getLogger(UserServlet.class);
+    private Storage storage;
+    private static final Logger log = getLogger(MealServlet.class);
+
+    @Override
+    public void init() throws ServletException {
+        storage = new MemoryStorage();
+        testMeals.forEach(storage::save);
+        log.debug("saving test data in storage");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("redirect to meals");
         String idString = request.getParameter("id");
         String action = request.getParameter("action");
-        List<MealTo> meals = filteredByStreams(storage.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
-        request.setAttribute("meals", meals);
         if (action == null) {
+            List<MealTo> meals = filteredByStreams(storage.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
+            request.setAttribute("meals", meals);
+            log.debug("redirect to meals - action null - showing meals list");
             request.getRequestDispatcher("meals.jsp").forward(request, response);
             return;
         }
         switch (action) {
             case "edit": {
                 int id = Integer.parseInt(idString);
-                request.setAttribute("meal", MealsUtil.createTo(storage.get(id), false));
+                request.setAttribute("meal", storage.get(id));
+                log.debug("redirect to edit.jsp - action edit");
                 request.getRequestDispatcher("edit.jsp").forward(request, response);
                 break;
             }
             case "add": {
-                request.setAttribute("meal", MealsUtil.createTo(new Meal(), false));
+                request.setAttribute("meal", new Meal());
+                log.debug("redirect to edit.jsp - action add");
                 request.getRequestDispatcher("edit.jsp").forward(request, response);
                 break;
             }
             case "delete": {
                 int id = Integer.parseInt(idString);
                 storage.delete(id);
+                log.debug("redirect to meals - delete action");
                 response.sendRedirect("meals");
                 break;
             }
-            case "clear": {
-                storage.clear();
+            default: {
+                log.debug("redirect to meals - not supported action");
                 response.sendRedirect("meals");
-                break;
             }
-            default:
-                throw new IOException("Action " + action + " is not supported");
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws NumberFormatException, DateTimeParseException, ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
+        log.debug("post method");
         String idString = request.getParameter("id");
+        LocalDateTime datetime = LocalDateTime.parse(request.getParameter("datetime"));
         String description = request.getParameter("description");
-        String caloriesString = request.getParameter("calories");
-        String dateTimeString = request.getParameter("datetime");
-        LocalDateTime datetime;
-        int calories = caloriesString.isEmpty() ? 0 : Integer.parseInt(caloriesString);
-        try {
-            datetime = LocalDateTime.parse(dateTimeString);
-        } catch (DateTimeParseException e) {
-            datetime = LocalDateTime.now().withSecond(0).withNano(0);
-        }
-        Meal meal;
-        if (idString == null) {
-            meal = new Meal();
-            meal.setDateTime(datetime);
-            meal.setCalories(calories);
-            meal.setDescription(description);
-        } else {
-            meal = new Meal(datetime, description, calories);
-            meal.setId(Integer.parseInt(idString));
-        }
-        storage.save(meal.getId(), meal);
+        int calories = Integer.parseInt(request.getParameter("calories"));
+
+        Meal meal = new Meal(datetime, description, calories);
+        meal.setId(idString.isEmpty() ? null : Integer.parseInt(idString));
+        storage.save(meal);
+        log.debug("redirect to meals - saving meal in storage");
         response.sendRedirect("meals");
     }
 

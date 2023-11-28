@@ -4,26 +4,21 @@ import ru.javawebinar.topjava.model.Meal;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class MapStorage implements Storage {
-
+public class MemoryStorage implements Storage {
+    final private AtomicInteger idCounter = new AtomicInteger(0);
     private final Map<Integer, Meal> storage = new ConcurrentHashMap<>();
 
-    public MapStorage() {
-    }
-
-    public MapStorage(List<Meal> mealList) {
-        mealList.forEach(meal -> storage.put(meal.getId(), meal));
+    public MemoryStorage() {
     }
 
     @Override
-    public void clear() {
-        storage.clear();
-    }
-
-    @Override
-    public void save(int id, Meal meal) {
-        storage.put(id, meal);
+    public Meal save(Meal meal) {
+        if (meal.getId() == null) {
+            meal.setId(idCounter.incrementAndGet());
+        }
+        return storage.put(meal.getId(), meal);
     }
 
     @Override
@@ -41,13 +36,4 @@ public class MapStorage implements Storage {
         return new ArrayList<>(storage.values());
     }
 
-    @Override
-    public int size() {
-        return storage.size();
-    }
-
-    @Override
-    public void update(Meal meal) {
-        storage.put(meal.getId(), meal);
-    }
 }
