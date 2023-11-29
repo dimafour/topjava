@@ -6,19 +6,20 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MemoryStorage implements Storage {
+public class MemoryMealStorage implements MealStorage {
     final private AtomicInteger idCounter = new AtomicInteger(0);
     private final Map<Integer, Meal> storage = new ConcurrentHashMap<>();
 
-    public MemoryStorage() {
+    public MemoryMealStorage() {
     }
 
     @Override
     public Meal save(Meal meal) {
-        if (meal.getId() == null) {
+        if (meal.getId() == null || !storage.containsKey(meal.getId())) {
             meal.setId(idCounter.incrementAndGet());
         }
-        return storage.put(meal.getId(), meal);
+        storage.put(meal.getId(), meal);
+        return meal;
     }
 
     @Override

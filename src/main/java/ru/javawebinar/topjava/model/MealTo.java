@@ -53,7 +53,7 @@ public class MealTo {
         return excess;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 }
