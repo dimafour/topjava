@@ -84,5 +84,4 @@ public class MealServlet extends HttpServlet {
         log.debug("redirect to meals - saving meal in storage");
         response.sendRedirect("meals");
     }
-
 }

@@ -46,5 +46,4 @@ public class Meal {
     public void setId(Integer id) {
         this.id = id;
     }
-
 }

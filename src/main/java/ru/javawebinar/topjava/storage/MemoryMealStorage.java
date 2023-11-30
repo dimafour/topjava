@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MemoryMealStorage implements MealStorage {
-    final private AtomicInteger idCounter = new AtomicInteger(0);
+    private final AtomicInteger idCounter = new AtomicInteger(0);
     private final Map<Integer, Meal> storage = new ConcurrentHashMap<>();
 
     public MemoryMealStorage() {
@@ -36,5 +36,4 @@ public class MemoryMealStorage implements MealStorage {
     public List<Meal> getAll() {
         return new ArrayList<>(storage.values());
     }
-
 }
