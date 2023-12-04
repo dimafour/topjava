@@ -19,10 +19,11 @@ import static ru.javawebinar.topjava.web.SecurityUtil.*;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(MealRestController.class);
+    private final Logger log = LoggerFactory.getLogger(MealRestController.class);
 
     @Autowired
     private final MealService service;
+
     public MealRestController(MealService service) {
         this.service = service;
     }
@@ -31,6 +32,7 @@ public class MealRestController {
         log.info("getAll");
         return getTos(service.getAll(authUserId()), authUserCaloriesPerDay());
     }
+
     public List<MealTo> getAll(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         log.info("get all meal filtered time from {} to {}", startTime, endTime);
         return getFilteredTos(service.getAll(authUserId(), endDate, startDate),

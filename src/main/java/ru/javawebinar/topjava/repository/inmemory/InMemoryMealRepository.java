@@ -11,11 +11,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
-    private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepository.class);
     private final Map<Integer, Meal> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
 
@@ -26,36 +27,39 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
+            meal.setUserId(userId);
             meal.setId(counter.incrementAndGet());
             repository.put(meal.getId(), meal);
             log.info("save meal {} with userId = {}", meal, userId);
             return meal;
         }
-        // handle case: update, but not present in storage
-        if (userId == repository.get(meal.getId()).getUserId()) {
-            log.info("update meal {} with userId = {}", meal, userId);
-            return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        Meal mealFromRep = repository.get(meal.getId());
+        if (mealFromRep == null || userId != mealFromRep.getUserId()) {
+            log.info("meal {} does not belong userId = {} or absent", meal, userId);
+            return null;
         }
-        log.info("meal {} does not belong userId = {}", meal, userId);
-        return null;
+        log.info("update meal {} with userId = {}", meal, userId);
+        meal.setUserId(userId);
+        // handle case: update, but not present in storage
+        return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        Integer mealUserId = repository.get(id).getUserId();
-        if (mealUserId == null || mealUserId != userId) {
+        Meal meal = repository.get(id);
+        if (meal == null || meal.getUserId() != userId) {
             log.info("meal id = {} does not belong userId = {} or absent", id, userId);
             return false;
         }
-        repository.remove(id);
         log.info("delete meal id={} with userId={}", id, userId);
-        return true;
+        return repository.remove(id) != null;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        Integer mealUserId = repository.get(id).getUserId();
-        if (mealUserId == null || mealUserId != userId) {
+        Meal meal = repository.get(id);
+        if (meal == null || meal.getUserId() != userId) {
             log.info("meal id = {} does not belong userId = {} or absent", id, userId);
             return null;
         }
@@ -66,15 +70,21 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate) {
         log.info("get all meal userId={} from {} to {}", userId, startDate, endDate);
-        return repository.values().stream()
-                .filter(meal -> meal.getUserId() == userId)
-                .filter(meal -> !meal.getDate().isAfter(endDate) && !meal.getDate().isBefore(startDate))
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
-                .collect(Collectors.toList());
+        return filterByPredicate(userId, meal -> !meal.getDate().isAfter(endDate) && !meal.getDate().isBefore(startDate));
     }
 
+    @Override
     public List<Meal> getAll(int userId) {
-        return getAll(userId, LocalDate.MIN, LocalDate.MAX);
+        log.info("get all meal userId={}", userId);
+        return filterByPredicate(userId, meal -> true);
+    }
+
+    private List<Meal> filterByPredicate(int userId, Predicate<Meal> filter) {
+        return repository.values().stream()
+                .filter(meal -> meal.getUserId() == userId)
+                .filter(filter)
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                .collect(Collectors.toList());
     }
 }
 
