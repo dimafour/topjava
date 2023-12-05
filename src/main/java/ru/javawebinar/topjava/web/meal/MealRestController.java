@@ -35,7 +35,7 @@ public class MealRestController {
 
     public List<MealTo> getAll(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         log.info("get all meal filtered time from {} to {}", startTime, endTime);
-        return getFilteredTos(service.getAll(authUserId(), endDate, startDate),
+        return getFilteredTos(service.getAll(authUserId(), startDate, endDate),
                 authUserCaloriesPerDay(), startTime, endTime);
     }
 

@@ -1,3 +1,7 @@
+<jsp:useBean id="startDate" scope="request" type="java.time.LocalDate"/>
+<jsp:useBean id="endDate" scope="request" type="java.time.LocalDate"/>
+<jsp:useBean id="startTime" scope="request" type="java.time.LocalTime"/>
+<jsp:useBean id="endTime" scope="request" type="java.time.LocalTime"/>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -23,6 +27,15 @@
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
+    <form method="post" action="meals">
+        <input type="date" value="${startDate}" name="startDate"> to
+        <input type="date" value="${endDate}" name="endDate"> <br><br>
+        <input type="time" value="${startTime}" name="startTime"> to
+        <input type="time" value="${endTime}" name="endTime">
+
+        <button type="submit">Apply</button>
+    </form>
+
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
         <tr>

@@ -14,9 +14,9 @@ import java.time.LocalTime;
 import java.util.Arrays;
 
 public class SpringMain {
-    static LocalDate ldTest = LocalDate.now();
-    static LocalDateTime dateTest1 = LocalDateTime.of(ldTest, LocalTime.of(4,0));
-    static LocalDateTime dateTest2 = LocalDateTime.of(ldTest, LocalTime.of(10,0));
+    static LocalDate dateTest = LocalDate.now();
+    static LocalDateTime dateTimeTest1 = LocalDateTime.of(dateTest, LocalTime.of(4,0));
+    static LocalDateTime dateTimeTest2 = LocalDateTime.of(dateTest, LocalTime.of(10,0));
 
     public static void main(String[] args) {
         // java 7 automatic resource management (ARM)
@@ -34,8 +34,8 @@ public class SpringMain {
             System.out.println("Get All meals: ");
             mealRestController.getAll().forEach(System.out::println);
 
-            mealRestController.create(new Meal(dateTest1, "Porridge", 666));
-            mealRestController.update(new Meal(dateTest2, "Dinner", 1555), 6);
+            mealRestController.create(new Meal(dateTimeTest1, "Porridge", 666));
+            mealRestController.update(new Meal(dateTimeTest2, "Dinner", 1555), 6);
             System.out.println("Get All meals after update: ");
             mealRestController.getAll().forEach(System.out::println);
 
