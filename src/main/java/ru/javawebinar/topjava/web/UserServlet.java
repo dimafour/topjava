@@ -16,21 +16,10 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("forward to users");
-        request.getRequestDispatcher("users.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String value = request.getParameter("profile");
-        if (value.equals("admin")) {
-            SecurityUtil.setAuthUserId(1);
-            log.info("profile set to admin (userId = 1)");
-        }
-        if (value.equals("user")) {
-            SecurityUtil.setAuthUserId(2);
-            log.info("profile set to user (userId = 2)");
-        }
-        request.getRequestDispatcher("index.html").forward(request, response);
+        int id = Integer.parseInt(request.getParameter("profile"));
+        SecurityUtil.setAuthUserId(id);
+        log.info("profile set to userId = {}", id);
+        response.sendRedirect("meals");
     }
 }
 

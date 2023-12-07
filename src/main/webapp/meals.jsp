@@ -1,7 +1,3 @@
-<jsp:useBean id="startDate" scope="request" type="java.time.LocalDate"/>
-<jsp:useBean id="endDate" scope="request" type="java.time.LocalDate"/>
-<jsp:useBean id="startTime" scope="request" type="java.time.LocalTime"/>
-<jsp:useBean id="endTime" scope="request" type="java.time.LocalTime"/>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -27,11 +23,11 @@
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
-    <form method="post" action="meals">
-        <input type="date" value="${startDate}" name="startDate"> to
-        <input type="date" value="${endDate}" name="endDate"> <br><br>
-        <input type="time" value="${startTime}" name="startTime"> to
-        <input type="time" value="${endTime}" name="endTime">
+    <form method="get" action="meals">
+        <input type="date" name="startDate" value="<%= request.getParameter("startDate") %>"> to
+        <input type="date" name="endDate" value="<%= request.getParameter("endDate") %>"> <br><br>
+        <input type="time" name="startTime" value="<%= request.getParameter ("startTime") %>"> to
+        <input type="time" name="endTime" value="<%= request.getParameter("endTime") %>">
 
         <button type="submit">Apply</button>
     </form>
