@@ -57,15 +57,6 @@ public class MealServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
-        String startDateStr = request.getParameter("startDate");
-        String endDateStr = request.getParameter("endDate");
-        String startTimeStr = request.getParameter("startTime");
-        String endTimeStr = request.getParameter("endTime");
-        LocalDate startDate = isNullOrEmpty(startDateStr) ? null : LocalDate.parse(startDateStr);
-        LocalDate endDate = isNullOrEmpty(endDateStr) ? null : LocalDate.parse(endDateStr);
-        LocalTime startTime = isNullOrEmpty(startTimeStr) ? null : LocalTime.parse(startTimeStr);
-        LocalTime endTime = isNullOrEmpty(endDateStr) ? null : LocalTime.parse(endTimeStr);
-
         switch (action == null ? "all" : action) {
             case "delete":
                 int id = getId(request);
@@ -82,12 +73,19 @@ public class MealServlet extends HttpServlet {
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "all":
-            default: {
+            default:
                 log.info("getAll");
+                String startDateStr = request.getParameter("startDate");
+                String endDateStr = request.getParameter("endDate");
+                String startTimeStr = request.getParameter("startTime");
+                String endTimeStr = request.getParameter("endTime");
+                LocalDate startDate = isNullOrEmpty(startDateStr) ? null : LocalDate.parse(startDateStr);
+                LocalDate endDate = isNullOrEmpty(endDateStr) ? null : LocalDate.parse(endDateStr);
+                LocalTime startTime = isNullOrEmpty(startTimeStr) ? null : LocalTime.parse(startTimeStr);
+                LocalTime endTime = isNullOrEmpty(endTimeStr) ? null : LocalTime.parse(endTimeStr);
                 request.setAttribute("meals", mealRestController.getAll(startDate, endDate, startTime, endTime));
                 request.getRequestDispatcher("meals.jsp").forward(request, response);
-            }
-            break;
+                break;
         }
     }
 
@@ -95,8 +93,8 @@ public class MealServlet extends HttpServlet {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
     }
+
     private boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
-
     }
 }

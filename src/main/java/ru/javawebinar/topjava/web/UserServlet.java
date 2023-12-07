@@ -16,10 +16,15 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("forward to users");
-        int id = Integer.parseInt(request.getParameter("profile"));
-        SecurityUtil.setAuthUserId(id);
-        log.info("profile set to userId = {}", id);
-        response.sendRedirect("meals");
+        String idStr = request.getParameter("profile");
+        if (idStr == null) {
+            request.getRequestDispatcher("users.jsp").forward(request, response);
+        } else {
+            int id = Integer.parseInt(idStr);
+            SecurityUtil.setAuthUserId(id);
+            log.info("profile set to userId = {}", id);
+            response.sendRedirect("meals");
+        }
     }
 }
 
