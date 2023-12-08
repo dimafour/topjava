@@ -21,7 +21,6 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 public class MealRestController {
     private final Logger log = LoggerFactory.getLogger(MealRestController.class);
 
-    @Autowired
     private final MealService service;
 
     public MealRestController(MealService service) {

@@ -49,7 +49,7 @@ public class MealServlet extends HttpServlet {
         } else {
             mealRestController.update(meal, meal.getId());
         }
-        request.getRequestDispatcher("/meals.jsp").forward(request, response);
+        response.sendRedirect("meals");
 
     }
 
@@ -84,7 +84,7 @@ public class MealServlet extends HttpServlet {
                 LocalTime startTime = isNullOrEmpty(startTimeStr) ? null : LocalTime.parse(startTimeStr);
                 LocalTime endTime = isNullOrEmpty(endTimeStr) ? null : LocalTime.parse(endTimeStr);
                 request.setAttribute("meals", mealRestController.getAll(startDate, endDate, startTime, endTime));
-                request.getRequestDispatcher("meals.jsp").forward(request, response);
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
     }
