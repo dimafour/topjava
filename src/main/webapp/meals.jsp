@@ -24,10 +24,10 @@
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <form method="get" action="meals">
-        <input type="date" name="startDate" value="<%= request.getParameter("startDate") %>"> to
-        <input type="date" name="endDate" value="<%= request.getParameter("endDate") %>"> <br><br>
-        <input type="time" name="startTime" value="<%= request.getParameter ("startTime") %>"> to
-        <input type="time" name="endTime" value="<%= request.getParameter("endTime") %>">
+        <input type="date" name="startDate" value=${param.get("startDate")}> to
+        <input type="date" name="endDate" value=${param.get("endDate")}> <br><br>
+        <input type="time" name="startTime" value=${param.get("startTime")}> to
+        <input type="time" name="endTime" value=${param.get("endTime")}>
 
         <button type="submit">Apply</button>
     </form>
