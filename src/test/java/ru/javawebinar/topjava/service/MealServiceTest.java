@@ -12,13 +12,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import java.time.LocalDateTime;
-import java.util.Comparator;
-
-import java.util.stream.Collectors;
-
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
+import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
+import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
@@ -37,8 +34,7 @@ public class MealServiceTest {
 
     @Test
     public void get() {
-        assertMatch(service.get(USER_MEAL2_ID, USER_ID), USER_MEAL2);
-        assertMatch(service.get(ADMIN_MEAL_ID, ADMIN_ID), ADMIN_MEAL);
+        assertMatch(service.get(ADMIN_MEAL_ID, ADMIN_ID), adminMeal);
     }
 
     @Test
@@ -50,15 +46,12 @@ public class MealServiceTest {
     @Test
     public void getBetweenInclusive() {
         assertMatch(service.getBetweenInclusive(DATE_FROM, DATE_TO, USER_ID),
-                userMealList.stream()
-                        .filter(meal -> !meal.getDate().isAfter(DATE_TO) && !meal.getDate().isBefore(DATE_FROM))
-                        .sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList()));
+                userMealListBetweenDates);
     }
 
     @Test
     public void getAll() {
-        assertMatch(service.getAll(USER_ID), userMealList.stream().sorted(Comparator.comparing(Meal::getDateTime)
-                .reversed()).collect(Collectors.toList()));
+        assertMatch(service.getAll(USER_ID), userMealListAllSorted);
     }
 
     @Test
@@ -91,14 +84,13 @@ public class MealServiceTest {
     @Test
     public void duplicateDateTimeCreate() {
         assertThrows(DataAccessException.class, () ->
-                service.create(new Meal(null, LocalDateTime.of(
-                        2023, 12, 14, 20, 0),
+                service.create(new Meal(null, service.get(USER_MEAL3_ID, USER_ID).getDateTime(),
                         "User meal #3 Duplicate", 888), USER_ID));
     }
 
     @Test
     public void updateNotFound() {
         Meal updated = getUpdated();
-        assertThrows(NotFoundException.class, () -> service.update(updated, ADMIN_MEAL_ID));
+        assertThrows(NotFoundException.class, () -> service.update(updated, ADMIN_ID));
     }
 }
