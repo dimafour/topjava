@@ -2,10 +2,14 @@ package ru.javawebinar.topjava;
 
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
 public class MealTestWatch extends Stopwatch {
+
+    private static final Logger log = LoggerFactory.getLogger(MealTestWatch.class);
 
     private static final StringBuilder result = new StringBuilder("\n");
 
@@ -16,17 +20,12 @@ public class MealTestWatch extends Stopwatch {
         overallTestTime += testTime;
         String testSummary = status + String.format("%-25s", description.getMethodName()) + testTime + " ms\n";
         result.append(testSummary);
-        System.out.println(testSummary);
+        log.info(testSummary);
     }
 
     @Override
     protected void succeeded(long nanos, Description description) {
         logInfo(description, "✔ ", nanos);
-    }
-
-    @Override
-    protected void failed(long nanos, Throwable e, Description description) {
-        logInfo(description, "X ", nanos);
     }
 
     public static String getResult() {

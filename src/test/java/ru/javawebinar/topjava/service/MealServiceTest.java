@@ -2,6 +2,8 @@ package ru.javawebinar.topjava.service;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -9,7 +11,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.MealTestWatch;
-import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -31,13 +32,14 @@ public class MealServiceTest {
 
     @Rule
     public MealTestWatch mealTestWatch = new MealTestWatch();
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
 
     @Autowired
     private MealService service;
 
     @AfterClass
     public static void summary() {
-        System.out.println(MealTestWatch.getResult());
+        log.info(MealTestWatch.getResult());
     }
 
     @Test
@@ -64,7 +66,6 @@ public class MealServiceTest {
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
         MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
-        newMeal.setUser(UserTestData.user);
     }
 
     @Test
@@ -94,7 +95,6 @@ public class MealServiceTest {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), updated);
-        updated.setUser(UserTestData.user);
     }
 
     @Test
