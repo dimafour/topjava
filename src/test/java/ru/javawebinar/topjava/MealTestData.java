@@ -12,7 +12,8 @@ import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
-    public static final MatcherFactory.Matcher<Meal> MEAL_MATCHER = MatcherFactory.usingIgnoringFieldsComparator("user.registered");
+    public static final MatcherFactory.Matcher<Meal> MEAL_MATCHER = MatcherFactory
+            .usingIgnoringFieldsComparator("user");
     public static final int NOT_FOUND = 10;
     public static final int MEAL1_ID = START_SEQ + 3;
     public static final int ADMIN_MEAL_ID = START_SEQ + 10;
@@ -42,14 +43,11 @@ public class MealTestData {
     public static final List<Meal> meals = Arrays.asList(meal7, meal6, meal5, meal4, meal3, meal2, meal1);
 
     public static Meal getNew() {
-        Meal meal = new Meal(of(2020, Month.FEBRUARY, 1, 18, 0), "Созданный ужин", 300);
-        meal.setUser(user);
-        return meal;
+        return new Meal(of(2020, Month.FEBRUARY, 1, 18, 0), "Созданный ужин", 300);
+
     }
 
     public static Meal getUpdated() {
-        Meal meal = new Meal(MEAL1_ID, meal1.getDateTime().plus(2, ChronoUnit.MINUTES), "Обновленный завтрак", 200);
-        meal.setUser(user);
-        return meal;
+        return new Meal(MEAL1_ID, meal1.getDateTime().plus(2, ChronoUnit.MINUTES), "Обновленный завтрак", 200);
     }
 }

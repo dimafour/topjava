@@ -8,12 +8,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -50,11 +52,12 @@ public class MealServiceTest {
     public void create() {
         Meal created = service.create(getNew(), USER_ID);
         int newId = created.id();
-        created = service.get(newId, USER_ID);
         Meal newMeal = getNew();
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
         MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
+        newMeal.setUser(UserTestData.user);
+        assertEquals(service.get(newId, USER_ID).getUser().getId(), newMeal.getUser().getId());
     }
 
     @Test
@@ -67,6 +70,7 @@ public class MealServiceTest {
     public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, adminMeal1);
+        assertEquals(actual.getUser().getId(), adminMeal1.getUser().getId());
     }
 
     @Test
@@ -83,7 +87,9 @@ public class MealServiceTest {
     public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
-        MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), getUpdated());
+        MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), updated);
+        updated.setUser(UserTestData.user);
+        assertEquals(service.get(MEAL1_ID, USER_ID).getUser().getId(), updated.getUser().getId());
     }
 
     @Test
