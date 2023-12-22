@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDateTime.of;
-import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
@@ -27,24 +26,10 @@ public class MealTestData {
     public static final Meal meal7 = new Meal(MEAL1_ID + 6, of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 510);
     public static final Meal adminMeal1 = new Meal(ADMIN_MEAL_ID, of(2020, Month.JANUARY, 31, 14, 0), "Админ ланч", 510);
     public static final Meal adminMeal2 = new Meal(ADMIN_MEAL_ID + 1, of(2020, Month.JANUARY, 31, 21, 0), "Админ ужин", 1500);
-
-    static {
-        meal1.setUser(user);
-        meal2.setUser(user);
-        meal3.setUser(user);
-        meal4.setUser(user);
-        meal5.setUser(user);
-        meal6.setUser(user);
-        meal7.setUser(user);
-        adminMeal1.setUser(admin);
-        adminMeal2.setUser(admin);
-    }
-
     public static final List<Meal> meals = Arrays.asList(meal7, meal6, meal5, meal4, meal3, meal2, meal1);
 
     public static Meal getNew() {
         return new Meal(of(2020, Month.FEBRUARY, 1, 18, 0), "Созданный ужин", 300);
-
     }
 
     public static Meal getUpdated() {

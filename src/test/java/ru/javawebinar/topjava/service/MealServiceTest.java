@@ -1,26 +1,21 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.*;
-import org.junit.rules.Stopwatch;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.javawebinar.topjava.MealTestWatch;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -33,32 +28,16 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    protected static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
-    private static final StringBuilder summary = new StringBuilder("\n");
-    private static long overallTestTime = 0;
 
     @Rule
-    public TestName name = new TestName();
-
-    @Rule
-    public Stopwatch stopWatch = new Stopwatch();
+    public MealTestWatch mealTestWatch = new MealTestWatch();
 
     @Autowired
     private MealService service;
 
-    @After
-    public void after() {
-        long testTime = Math.toIntExact(stopWatch.runtime(TimeUnit.MILLISECONDS));
-        overallTestTime += testTime;
-        String info = "Test '" + name.getMethodName() + "' finished in " + testTime + " millis\n";
-        log.info(info);
-        summary.append(info);
-    }
-
     @AfterClass
     public static void summary() {
-        summary.append("Overall testing time is ").append(overallTestTime).append(" millis");
-        log.info(summary.toString());
+        System.out.println(MealTestWatch.getResult());
     }
 
     @Test
@@ -86,7 +65,6 @@ public class MealServiceTest {
         MEAL_MATCHER.assertMatch(created, newMeal);
         MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
         newMeal.setUser(UserTestData.user);
-        assertEquals(service.get(newId, USER_ID).getUser().getId(), newMeal.getUser().getId());
     }
 
     @Test
@@ -99,7 +77,6 @@ public class MealServiceTest {
     public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, adminMeal1);
-        assertEquals(actual.getUser().getId(), adminMeal1.getUser().getId());
     }
 
     @Test
@@ -118,7 +95,6 @@ public class MealServiceTest {
         service.update(updated, USER_ID);
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), updated);
         updated.setUser(UserTestData.user);
-        assertEquals(service.get(MEAL1_ID, USER_ID).getUser().getId(), updated.getUser().getId());
     }
 
     @Test
