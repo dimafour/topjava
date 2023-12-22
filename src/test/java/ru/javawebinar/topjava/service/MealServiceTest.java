@@ -1,7 +1,11 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Stopwatch;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,6 +18,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -28,9 +33,33 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    protected static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final StringBuilder summary = new StringBuilder("\n");
+    private static long overallTestTime = 0;
+
+    @Rule
+    public TestName name = new TestName();
+
+    @Rule
+    public Stopwatch stopWatch = new Stopwatch();
 
     @Autowired
     private MealService service;
+
+    @After
+    public void after() {
+        long testTime = Math.toIntExact(stopWatch.runtime(TimeUnit.MILLISECONDS));
+        overallTestTime += testTime;
+        String info = "Test '" + name.getMethodName() + "' finished in " + testTime + " millis\n";
+        log.info(info);
+        summary.append(info);
+    }
+
+    @AfterClass
+    public static void summary() {
+        summary.append("Overall testing time is ").append(overallTestTime).append(" millis");
+        log.info(summary.toString());
+    }
 
     @Test
     public void delete() {
