@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
+
     @Transactional
     @Modifying
     @Query("DELETE FROM Meal m WHERE m.id=?1 AND m.user.id=?2")
@@ -22,8 +23,6 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
     Optional<Meal> findByIdAndUserId(Integer id, Integer userId);
 
     List<Meal> getMealsByUserIdOrderByDateTimeDesc(Integer userId);
-
-    Meal getFirstByUserId(Integer userId);
 
     @Transactional
     @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime >= :start " +

@@ -10,38 +10,40 @@ import java.util.List;
 @Repository
 public class DataJpaMealRepository implements MealRepository {
 
-    private final CrudMealRepository crudRepository;
+    private final CrudMealRepository crudMealRepository;
+    private final CrudUserRepository crudUserRepository;
 
-    public DataJpaMealRepository(CrudMealRepository crudRepository) {
-        this.crudRepository = crudRepository;
+    public DataJpaMealRepository(CrudMealRepository crudMealRepository, CrudUserRepository crudUserRepository) {
+        this.crudMealRepository = crudMealRepository;
+        this.crudUserRepository = crudUserRepository;
     }
 
     @Override
     public Meal save(Meal meal, int userId) {
-        meal.setUser(crudRepository.getFirstByUserId(userId).getUser());
+        meal.setUser(crudUserRepository.getReferenceById(userId));
         if (meal.isNew()) {
-            return crudRepository.save(meal);
+            return crudMealRepository.save(meal);
         }
-        return get(meal.id(), userId) == null ? null : crudRepository.save(meal);
+        return get(meal.id(), userId) == null ? null : crudMealRepository.save(meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        return crudRepository.delete(id, userId) != 0;
+        return crudMealRepository.delete(id, userId) != 0;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        return crudRepository.findByIdAndUserId(id, userId).orElse(null);
+        return crudMealRepository.findByIdAndUserId(id, userId).orElse(null);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return crudRepository.getMealsByUserIdOrderByDateTimeDesc(userId);
+        return crudMealRepository.getMealsByUserIdOrderByDateTimeDesc(userId);
     }
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-        return crudRepository.getBetweenHalfOpen(startDateTime, endDateTime, userId);
+        return crudMealRepository.getBetweenHalfOpen(startDateTime, endDateTime, userId);
     }
 }

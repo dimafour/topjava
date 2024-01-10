@@ -9,6 +9,7 @@ import ru.javawebinar.topjava.model.User;
 
 @Transactional(readOnly = true)
 public interface CrudUserRepository extends JpaRepository<User, Integer> {
+
     @Transactional
     @Modifying
 //    @Query(name = User.DELETE)
