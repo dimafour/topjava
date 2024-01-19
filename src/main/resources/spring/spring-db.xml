@@ -15,8 +15,6 @@
         <jdbc:script encoding="utf-8" location="classpath:db/populateDB.sql"/>
     </jdbc:initialize-database>
 
-    <context:property-placeholder location="classpath:db/postgres.properties" system-properties-mode="OVERRIDE"/>
-
     <tx:annotation-driven/>
 
     <beans profile="jpa, datajpa">
@@ -77,6 +75,7 @@
     </beans>
 
     <beans profile="postgres">
+        <context:property-placeholder location="classpath:db/postgres.properties" system-properties-mode="OVERRIDE"/>
         <!--
             For postgres driver logging
             It uses java.util.logging and logged via jul-to-slf4j bridge
