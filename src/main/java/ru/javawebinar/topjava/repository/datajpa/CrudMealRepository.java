@@ -18,10 +18,10 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
     int delete(int id, int userId);
 
     @Query("SELECT m FROM Meal m WHERE m.id=?1 AND m.user.id=?2")
-    Meal get(Integer id, Integer userId);
+    Meal get(int id, int userId);
 
     @Query("SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC")
-    List<Meal> getAll(@Param("userId") Integer userId);
+    List<Meal> getAll(@Param("userId") int userId);
 
     @Transactional
     @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime >= :start " +
@@ -31,5 +31,5 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
                                   @Param("userId") int userId);
 
     @Query("SELECT m FROM Meal m JOIN FETCH m.user WHERE m.id=?1 AND m.user.id=?2")
-    Meal getMealWithUser(int id, int userId);
+    Meal getWithUser(int id, int userId);
 }

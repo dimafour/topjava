@@ -3,7 +3,6 @@ package ru.javawebinar.topjava;
 import org.springframework.util.ClassUtils;
 
 public class Profiles {
-    public static String[] contextConfiguration = new String[]{"spring/spring-app.xml", "spring/spring-db.xml"};
     public static final String
             JDBC = "jdbc",
             JPA = "jpa",
