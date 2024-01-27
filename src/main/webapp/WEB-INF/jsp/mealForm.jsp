@@ -4,17 +4,13 @@
 
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
-<head>
-    <title><spring:message code="meal.title"/></title>
-</head>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
     <h3><a href="index.jsp"><spring:message code="app.home"/></a></h3>
     <hr>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <c:if test="${meal.id==null}"><h2><spring:message code="meal.new"/></h2></c:if>
-    <c:if test="${meal.id!=null}"><h2><spring:message code="meal.edit"/></h2></c:if>
+    <h2><spring:message code="meal.${meal.isNew()? 'new' : 'edit'}"/></h2>
     <form method="post">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
