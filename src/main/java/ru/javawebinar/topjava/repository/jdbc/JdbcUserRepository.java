@@ -92,20 +92,21 @@ public class JdbcUserRepository implements UserRepository {
     public List<User> getAll() {
         return jdbcTemplate.query("SELECT * FROM users LEFT JOIN user_role ur on users.id = ur.user_id ORDER BY name, email",
                 rs -> {
-                    Map<User, Set<Role>> usersRoles = new LinkedHashMap<>();
+                    Map<User, EnumSet<Role>> usersRoles = new LinkedHashMap<>();
+                    int prevId = -1;
+                    User user = null;
                     while (rs.next()) {
-                        User user = new User(rs.getInt("id"), rs.getString("name"),
-                                rs.getString("email"), rs.getString("password"),
-                                rs.getInt("calories_per_day"), rs.getBoolean("enabled"),
-                                rs.getDate("registered"), null);
-                        usersRoles.putIfAbsent(user, new HashSet<>());
+                        int curId = rs.getInt("id");
+                        user = curId == prevId ? user : ROW_MAPPER.mapRow(rs, rs.getRow());
+                        prevId = curId;
+                        usersRoles.putIfAbsent(user, EnumSet.noneOf(Role.class));
                         String role = rs.getString("role");
                         if (role != null) {
                             usersRoles.get(user).add(Role.valueOf(role));
                         }
                     }
                     usersRoles.forEach((u, r) -> u.setRoles(usersRoles.get(u).isEmpty() ? EnumSet.noneOf(Role.class) : r));
-                    return new LinkedList<>(usersRoles.keySet());
+                    return new ArrayList<>(usersRoles.keySet());
                 });
     }
 

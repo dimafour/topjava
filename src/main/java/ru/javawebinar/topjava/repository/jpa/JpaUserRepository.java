@@ -61,7 +61,7 @@ public class JpaUserRepository implements UserRepository {
         List<User> users = em.createNamedQuery(User.BY_EMAIL, User.class)
                 .setParameter(1, email)
                 .getResultList();
-        return users.getFirst();
+        return users.isEmpty() ? null : users.getFirst();
     }
 
     @Override

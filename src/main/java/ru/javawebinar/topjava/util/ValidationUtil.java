@@ -6,10 +6,7 @@ import org.springframework.lang.NonNull;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import javax.validation.*;
 import java.util.Set;
 
 public class ValidationUtil {
@@ -62,9 +59,9 @@ public class ValidationUtil {
     }
 
     public static <T> void validate(T t) {
-        Set<ConstraintViolation<Object>> violations = validator.validate(t);
-        for (ConstraintViolation<Object> v : violations) {
-            throw new ValidationException(v.getMessage());
+        Set<ConstraintViolation<T>> violations = validator.validate(t);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
         }
     }
 }
