@@ -92,21 +92,15 @@ public class JdbcUserRepository implements UserRepository {
     public List<User> getAll() {
         return jdbcTemplate.query("SELECT * FROM users LEFT JOIN user_role ur on users.id = ur.user_id ORDER BY name, email",
                 rs -> {
-                    Map<User, EnumSet<Role>> usersRoles = new LinkedHashMap<>();
-                    int prevId = -1;
-                    User user = null;
+                    Map<Integer, User> users = new LinkedHashMap<>();
                     while (rs.next()) {
-                        int curId = rs.getInt("id");
-                        user = curId == prevId ? user : ROW_MAPPER.mapRow(rs, rs.getRow());
-                        prevId = curId;
-                        usersRoles.putIfAbsent(user, EnumSet.noneOf(Role.class));
+                        int id = rs.getInt("id");
+                        User user = users.containsKey(id) ? users.get(id) : ROW_MAPPER.mapRow(rs, rs.getRow());
+                        users.putIfAbsent(id, user);
                         String role = rs.getString("role");
-                        if (role != null) {
-                            usersRoles.get(user).add(Role.valueOf(role));
-                        }
+                        users.get(id).addRole(role == null ? null : Role.valueOf(role));
                     }
-                    usersRoles.forEach((u, r) -> u.setRoles(usersRoles.get(u).isEmpty() ? EnumSet.noneOf(Role.class) : r));
-                    return new ArrayList<>(usersRoles.keySet());
+                    return new ArrayList<>(users.values());
                 });
     }
 
@@ -116,7 +110,7 @@ public class JdbcUserRepository implements UserRepository {
             return null;
         }
         user.setRoles(jdbcTemplate.query("SELECT * FROM user_role WHERE user_id=?", rs -> {
-            Set<Role> roles = new HashSet<>();
+            Set<Role> roles = EnumSet.noneOf(Role.class);
             while (rs.next()) {
                 roles.add(Role.valueOf(rs.getString("role")));
             }
