@@ -95,8 +95,11 @@ public class JdbcUserRepository implements UserRepository {
                     Map<Integer, User> users = new LinkedHashMap<>();
                     while (rs.next()) {
                         int id = rs.getInt("id");
-                        User user = users.containsKey(id) ? users.get(id) : ROW_MAPPER.mapRow(rs, rs.getRow());
-                        users.putIfAbsent(id, user);
+                        User user = users.get(id);
+                        if (user == null) {
+                            user = ROW_MAPPER.mapRow(rs, rs.getRow());
+                            users.put(id, user);
+                        }
                         String role = rs.getString("role");
                         users.get(id).addRole(role == null ? null : Role.valueOf(role));
                     }

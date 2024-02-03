@@ -5,9 +5,10 @@
 
     <import resource="spring-app.xml"/>
     <import resource="spring-db.xml"/>
+    <bean name="ehCacheManager" class="org.springframework.cache.support.NoOpCacheManager"/>
     <beans profile="jpa, datajpa">
-    <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
-        <property name="location" value="classpath:spring/cache-off.cfg"/>
-    </bean>
-</beans>
+        <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
+            <property name="location" value="classpath:spring/cache-off.cfg"/>
+        </bean>
+    </beans>
 </beans>
