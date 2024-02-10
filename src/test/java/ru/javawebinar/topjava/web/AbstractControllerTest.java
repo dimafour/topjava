@@ -56,7 +56,7 @@ public abstract class AbstractControllerTest {
         return mockMvc.perform(builder);
     }
 
-    protected void getWithMeals() throws Exception {
+    protected void isDataJpa() {
         Assumptions.assumeTrue(Arrays.stream(env.getActiveProfiles()).anyMatch(x-> x.contains(Profiles.DATAJPA)));
     }
 }
