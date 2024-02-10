@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -16,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.javawebinar.topjava.MealTestData.meals;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 class AdminRestControllerTest extends AbstractControllerTest {
@@ -37,14 +35,12 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void getWithMeals() throws Exception {
+    protected void getWithMeals() throws Exception {
+        super.getWithMeals();
         perform(MockMvcRequestBuilders.get(REST_URL + USER_ID + "/with-meals"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(USER_MATCHER.contentJson(user));
-        User actual = userService.getWithMeals(USER_ID);
-        USER_MATCHER.assertMatch(actual, user);
-        MealTestData.MEAL_MATCHER.assertMatch(actual.getMeals(), meals);
+                .andExpect(USER_MEAL_MATCHER.contentJson(user));
     }
 
     @Test
