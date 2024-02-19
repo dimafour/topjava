@@ -30,6 +30,10 @@ public class DateTimeUtil {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
 
+    public static String isoFormat(LocalDateTime ldt) {
+        return ldt == null ? "" : ldt.format(DateTimeFormatter.ISO_DATE_TIME);
+    }
+
     public static @Nullable
     LocalDate parseLocalDate(@Nullable String str) {
         return StringUtils.hasLength(str) ? LocalDate.parse(str) : null;
