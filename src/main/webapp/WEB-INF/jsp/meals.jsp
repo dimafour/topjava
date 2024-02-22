@@ -35,6 +35,7 @@
             </div>
             <div class="card-footer text-center">
                 <button class="btn btn-primary" onclick="ctx.filter()"><spring:message code="meal.filter"/></button>
+                <button class="btn btn-warning" onclick="clearFilter()"><spring:message code="common.reset"/></button>
             </div>
         </div>
         <br>
@@ -53,7 +54,7 @@
             <c:forEach items="${requestScope.meals}" var="meal">
                 <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
                 <tr id="${meal.id}" data-meal-excess="${meal.excess}">
-                    <td>${fn:formatDateTimeISO(meal.dateTime)}</td>
+                    <td>${fn:formatDateTime(meal.dateTime)}</td>
                     <td>${meal.description}</td>
                     <td>${meal.calories}</td>
                     <td><a><span class="fa fa-pencil"></span></a></td>

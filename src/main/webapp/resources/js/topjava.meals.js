@@ -7,10 +7,17 @@ const ctx = {
             type: "GET",
             url: mealAjaxUrl + "filter",
             data: $("#filter").serialize()
-        }).done(
-            ctx.datatableApi.clear().rows.add(data).draw()
-        )
+        }).done(updateData)
     }
+}
+
+function updateData(data) {
+    ctx.datatableApi.clear().rows.add(data).draw();
+}
+
+function clearFilter() {
+    $("#filter")[0].reset();
+    $.get(mealAjaxUrl, updateData);
 }
 
 

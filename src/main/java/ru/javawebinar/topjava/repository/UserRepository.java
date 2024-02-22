@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 
 import java.util.List;
@@ -20,6 +21,11 @@ public interface UserRepository {
     List<User> getAll();
 
     default User getWithMeals(int id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Transactional
+    default boolean enable(int id, boolean enable) {
         throw new UnsupportedOperationException();
     }
 }

@@ -5,6 +5,20 @@ const ctx = {
     ajaxUrl: userAjaxUrl
 };
 
+function check(checkbox, id) {
+    const enabled = checkbox.is(":checked");
+    $.ajax({
+        url: userAjaxUrl + id,
+        type: "POST",
+        data: "enabled=" + enabled
+    }).done(function () {
+        checkbox.closest("tr").attr("data-user-enabled", enabled);
+        successNoty(enabled ? "Пользователь активирован" : "Пользователь деактивирован");
+    }).fail(function () {
+        $(checkbox).prop("checked", !enabled);
+    });
+}
+
 // $(document).ready(function () {
 $(function () {
     makeEditable(
@@ -41,7 +55,12 @@ $(function () {
                     0,
                     "asc"
                 ]
-            ]
+            ],
+            "createdRow": function (row, data, index) {
+                if (!data.enabled()) {
+                    $(row).attr("data-user-enabled", false)
+                }
+            }
         })
     );
 });

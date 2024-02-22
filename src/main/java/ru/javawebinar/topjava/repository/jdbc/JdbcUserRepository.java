@@ -67,6 +67,11 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean enable(int id, boolean enable) {
+        return jdbcTemplate.update("UPDATE users SET enabled=? WHERE id=?", enable, id) != 0;
+    }
+
+    @Override
     @Transactional
     public boolean delete(int id) {
         return jdbcTemplate.update("DELETE FROM users WHERE id=?", id) != 0;
