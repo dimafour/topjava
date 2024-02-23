@@ -11,10 +11,6 @@ const ctx = {
     }
 }
 
-function updateData(data) {
-    ctx.datatableApi.clear().rows.add(data).draw();
-}
-
 function clearFilter() {
     $("#filter")[0].reset();
     $.get(mealAjaxUrl, updateData);

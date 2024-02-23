@@ -39,6 +39,7 @@ public class JpaUserRepository implements UserRepository {
     }
 
     @Override
+    @Transactional
     public boolean enable(int id, boolean enable) {
         return em.createNamedQuery(User.ENABLE)
                        .setParameter("enable", enable)
