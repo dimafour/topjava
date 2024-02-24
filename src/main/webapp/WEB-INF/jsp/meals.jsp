@@ -34,7 +34,7 @@
                 </form>
             </div>
             <div class="card-footer text-center">
-                <button class="btn btn-primary" onclick="ctx.filter()"><spring:message code="meal.filter"/></button>
+                <button class="btn btn-primary" onclick="ctx.updateTable()"><spring:message code="meal.filter"/></button>
                 <button class="btn btn-warning" onclick="clearFilter()"><spring:message code="common.reset"/></button>
             </div>
         </div>

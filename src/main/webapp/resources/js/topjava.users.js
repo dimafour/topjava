@@ -2,7 +2,10 @@ const userAjaxUrl = "admin/users/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
-    ajaxUrl: userAjaxUrl
+    ajaxUrl: userAjaxUrl,
+    updateTable: function () {
+        $.get(userAjaxUrl, updateTableWithData);
+    }
 };
 
 function check(checkbox, id) {
@@ -56,8 +59,8 @@ $(function () {
                     "asc"
                 ]
             ],
-            "createdRow": function (row, data, index) {
-                if (!data.enabled()) {
+            "createdRow": function (row, data) {
+                if (!data.enabled) {
                     $(row).attr("data-user-enabled", false)
                 }
             }
