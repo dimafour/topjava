@@ -12,6 +12,18 @@ const ctx = {
     }
 };
 
+$.ajaxSetup({
+    converters: {
+        "text json": function (stringData) {
+            return JSON.parse(stringData,
+                function (key, value) {
+                    return (key === 'dateTime') ? value.substring(0, 16).replace('T', ' ') : value;
+                }
+            );
+        }
+    }
+});
+
 function clearFilter() {
     $("#filter")[0].reset();
     $.get(mealAjaxUrl, updateTableByData);
@@ -20,6 +32,10 @@ function clearFilter() {
 $(function () {
     makeEditable(
         $("#datatable").DataTable({
+            "ajax": {
+                "url": mealAjaxUrl,
+                "dataSrc": ""
+            },
             "paging": false,
             "info": true,
             "columns": [
@@ -33,12 +49,14 @@ $(function () {
                     "data": "calories"
                 },
                 {
-                    "defaultContent": "Edit",
-                    "orderable": false
+                    "defaultContent": "",
+                    "orderable": false,
+                    "render": renderEditBtn
                 },
                 {
-                    "defaultContent": "Delete",
-                    "orderable": false
+                    "defaultContent": "",
+                    "orderable": false,
+                    "render": renderDeleteBtn
                 }
             ],
             "order": [
@@ -46,7 +64,10 @@ $(function () {
                     0,
                     "desc"
                 ]
-            ]
+            ],
+            "createdRow": function (row, data, dataIndex) {
+                $(row).attr("data-meal-excess", data.excess);
+            }
         })
     );
 });

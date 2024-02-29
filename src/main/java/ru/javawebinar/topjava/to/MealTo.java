@@ -1,20 +1,33 @@
 package ru.javawebinar.topjava.to;
 
-import java.beans.ConstructorProperties;
+import javax.validation.constraints.*;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class MealTo extends BaseTo {
+public class MealTo extends BaseTo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    private final LocalDateTime dateTime;
+    @NotNull
+    @PastOrPresent
+    private LocalDateTime dateTime;
 
-    private final String description;
+    @NotBlank
+    @Size(min = 2, max = 120)
+    private String description;
 
-    private final int calories;
+    @NotNull
+    @Min(5)
+    @Max(5000)
+    private Integer calories;
 
-    private final boolean excess;
+    private boolean excess;
 
-    @ConstructorProperties({"id", "dateTime", "description", "calories", "excess"})
+    public MealTo() {
+    }
+
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
         super(id);
         this.dateTime = dateTime;
@@ -39,16 +52,32 @@ public class MealTo extends BaseTo {
         return excess;
     }
 
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public void setExcess(boolean excess) {
+        this.excess = excess;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MealTo mealTo = (MealTo) o;
-        return calories == mealTo.calories &&
-                excess == mealTo.excess &&
-                Objects.equals(id, mealTo.id) &&
-                Objects.equals(dateTime, mealTo.dateTime) &&
-                Objects.equals(description, mealTo.description);
+        return Objects.equals(calories, mealTo.calories) &&
+               excess == mealTo.excess &&
+               Objects.equals(id, mealTo.id) &&
+               Objects.equals(dateTime, mealTo.dateTime) &&
+               Objects.equals(description, mealTo.description);
     }
 
     @Override
@@ -59,11 +88,11 @@ public class MealTo extends BaseTo {
     @Override
     public String toString() {
         return "MealTo{" +
-                "id=" + id +
-                ", dateTime=" + dateTime +
-                ", description='" + description + '\'' +
-                ", calories=" + calories +
-                ", excess=" + excess +
-                '}';
+               "id=" + id +
+               ", dateTime=" + dateTime +
+               ", description='" + description + '\'' +
+               ", calories=" + calories +
+               ", excess=" + excess +
+               '}';
     }
 }
