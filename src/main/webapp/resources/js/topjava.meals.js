@@ -70,4 +70,23 @@ $(function () {
             }
         })
     );
+    const dateConfig = {
+        timepicker: false,
+        format: 'Y-m-d',
+        formatDate: 'Y-m-d',
+    };
+    const timeConfig = {
+        datepicker: false,
+        format: 'H:i',
+        step: 30
+    }
+
+    $('#startDate').datetimepicker(dateConfig);
+    $('#endDate').datetimepicker(dateConfig);
+    $('#startTime').datetimepicker(timeConfig);
+    $('#endTime').datetimepicker(timeConfig);
+
+    $('#dateTime').datetimepicker({
+        format: 'Y-m-d H:i'
+    });
 });
