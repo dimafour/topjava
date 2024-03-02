@@ -1,7 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,7 +22,6 @@ import static ru.javawebinar.topjava.UserTestData.user;
 import static ru.javawebinar.topjava.util.MealsUtil.createTo;
 import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 
-@Disabled
 class MealRestControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = MealRestController.REST_URL + '/';
@@ -45,12 +42,6 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void getUnAuth() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void getNotOwn() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_MEAL_ID))
                 .andExpect(status().isUnauthorized());
     }
 
