@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,6 +10,9 @@ import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
+
+import javax.persistence.PersistenceException;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -81,6 +83,18 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateDuplicateDateTime() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDateTime(LocalDateTime.parse("2020-01-31T20:00"));
+        assertThrows(PersistenceException.class, () -> {
+            perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(user))
+                    .content(JsonUtil.writeValue(updated)))
+                    .andDo(result -> em.flush());
+        });
+    }
+
+    @Test
     void updateNotValid() throws Exception {
         Meal updated = getUpdated();
         updated.setCalories(null);
@@ -105,6 +119,19 @@ class MealRestControllerTest extends AbstractControllerTest {
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
         MEAL_MATCHER.assertMatch(mealService.get(newId, USER_ID), newMeal);
+    }
+
+    @Test
+    void createDuplicateDateTime() throws Exception {
+        Meal newMeal = getNew();
+        newMeal.setDateTime(LocalDateTime.parse("2020-01-31T20:00"));
+        assertThrows(PersistenceException.class, () -> {
+            perform(MockMvcRequestBuilders.post(REST_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(user))
+                    .content(JsonUtil.writeValue(newMeal)))
+                    .andDo(result -> em.flush());
+        });
     }
 
     @Test

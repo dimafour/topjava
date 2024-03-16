@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.util;
 
 
 import org.springframework.core.NestedExceptionUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.BindException;
 import ru.javawebinar.topjava.HasId;
@@ -81,4 +82,10 @@ public class ValidationUtil {
                 .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
                 .collect(Collectors.joining("<br>"));
     }
+
+    public static boolean checkDuplicateParameter(DataIntegrityViolationException e, String tableName, String param) {
+        String message = getRootCause(e).getMessage();
+        return message != null && message.contains(tableName) && message.contains(param);
+    }
+
 }

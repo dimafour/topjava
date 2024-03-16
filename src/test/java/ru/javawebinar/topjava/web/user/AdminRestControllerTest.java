@@ -10,11 +10,11 @@ import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import javax.persistence.PersistenceException;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
 
@@ -96,6 +96,19 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateDuplicateMail() {
+        User updated = getUpdated();
+        updated.setEmail("admin@gmail.com");
+        assertThrows(PersistenceException.class, () -> {
+             perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(admin))
+                    .content(jsonWithPassword(updated, updated.getPassword())))
+                    .andDo(result -> em.flush());
+        });
+    }
+
+    @Test
     void updateNotValid() throws Exception {
         User updated = getUpdated();
         updated.setPassword("");
@@ -132,6 +145,19 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(admin))
                 .content(jsonWithPassword(newUser, newUser.getPassword())))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void createDuplicateMail() {
+        User newUser = getNew();
+        newUser.setEmail("admin@gmail.com");
+        assertThrows(PersistenceException.class, () -> {
+            perform(MockMvcRequestBuilders.post(REST_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(admin))
+                    .content(jsonWithPassword(newUser, newUser.getPassword())))
+                    .andDo(result -> em.flush());
+        });
     }
 
     @Test
