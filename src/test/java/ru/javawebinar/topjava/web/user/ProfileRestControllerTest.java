@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.UserTo;
@@ -12,9 +14,6 @@ import ru.javawebinar.topjava.util.UsersUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import javax.persistence.PersistenceException;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,14 +77,14 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void registerDuplicateMail() throws Exception {
         UserTo newTo = new UserTo(null, "abc", "admin@gmail.com", "123456", 1500);
-        assertThrows(PersistenceException.class, () -> {
-            perform(MockMvcRequestBuilders.post(REST_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(JsonUtil.writeValue(newTo)))
-                    .andDo((result -> em.flush()));
-        });
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(newTo)))
+                .andExpect(status().isConflict())
+                .andExpect(ERROR_MATCHER.contentJson(ERROR_INFO_CREATE_USER));
     }
 
     @Test
@@ -111,14 +110,14 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void updateDuplicate() throws Exception {
         UserTo updatedTo = new UserTo(null, "updatedUser", "admin@gmail.com", "newPassword", 1500);
-        assertThrows(PersistenceException.class, () -> {
-            perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
-                    .with(userHttpBasic(user))
-                    .content(JsonUtil.writeValue(updatedTo)))
-                    .andDo(result -> em.flush());
-        });
+        perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andExpect(status().isConflict())
+                .andExpect(ERROR_MATCHER.contentJson(ERROR_INFO_UPDATE_USER));
     }
 
     @Test

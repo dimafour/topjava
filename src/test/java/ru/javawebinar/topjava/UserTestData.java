@@ -2,6 +2,8 @@ package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
+import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.util.Collections;
@@ -30,6 +32,10 @@ public class UserTestData {
     public static final User user = new User(USER_ID, "User", "user@yandex.ru", "password", 2005, Role.USER);
     public static final User admin = new User(ADMIN_ID, "Admin", "admin@gmail.com", "admin", 1900, Role.ADMIN, Role.USER);
     public static final User guest = new User(GUEST_ID, "Guest", "guest@gmail.com", "guest", 2000);
+    public static final ErrorInfo ERROR_INFO_CREATE_USER = new ErrorInfo("http://localhost/rest/profile", ErrorType.DATA_ERROR, "User with this email already exists");
+    public static final ErrorInfo ERROR_INFO_CREATE_ADMIN= new ErrorInfo("http://localhost/rest/admin/users/", ErrorType.DATA_ERROR, "User with this email already exists");
+    public static final ErrorInfo ERROR_INFO_UPDATE_ADMIN = new ErrorInfo("http://localhost/rest/admin/users/100000", ErrorType.DATA_ERROR, "User with this email already exists");
+    public static final ErrorInfo ERROR_INFO_UPDATE_USER = new ErrorInfo("http://localhost/rest/profile", ErrorType.DATA_ERROR, "User with this email already exists");
 
     static {
         user.setMeals(meals);

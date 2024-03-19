@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
+import ru.javawebinar.topjava.MatcherFactory;
 import ru.javawebinar.topjava.Profiles;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -32,7 +32,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @Transactional
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class, profiles = Profiles.REPOSITORY_IMPLEMENTATION)
 public abstract class AbstractControllerTest {
-
+    public static MatcherFactory.Matcher<ErrorInfo> ERROR_MATCHER = MatcherFactory.usingEqualsComparator(ErrorInfo.class);
     private static final CharacterEncodingFilter CHARACTER_ENCODING_FILTER = new CharacterEncodingFilter();
 
     static {
@@ -47,9 +47,6 @@ public abstract class AbstractControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @PersistenceContext
-    protected EntityManager em;
 
     protected void assumeDataJpa() {
         Assumptions.assumeTrue(env.acceptsProfiles(org.springframework.core.env.Profiles.of(Profiles.DATAJPA)), "DATA-JPA only");

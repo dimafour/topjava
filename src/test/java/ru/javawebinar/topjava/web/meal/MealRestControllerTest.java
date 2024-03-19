@@ -5,13 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
-
-import javax.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -82,15 +82,15 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void updateDuplicateDateTime() throws Exception {
         Meal updated = getUpdated();
         updated.setDateTime(meal5.getDateTime());
-        assertThrows(PersistenceException.class, () -> {
-            perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
-                    .with(userHttpBasic(user))
-                    .content(JsonUtil.writeValue(updated)))
-                    .andDo(result -> em.flush());
-        });
+        perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(updated)))
+                .andExpect(status().isConflict())
+                .andExpect(ERROR_MATCHER.contentJson(ERROR_INFO_UPDATE));
     }
 
     @Test
@@ -121,16 +121,16 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void createDuplicateDateTime() throws Exception {
         Meal newMeal = getNew();
         newMeal.setDateTime(meal5.getDateTime());
-        assertThrows(PersistenceException.class, () -> {
-            perform(MockMvcRequestBuilders.post(REST_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .with(userHttpBasic(user))
-                    .content(JsonUtil.writeValue(newMeal)))
-                    .andDo(result -> em.flush());
-        });
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(newMeal)))
+                .andExpect(status().isConflict())
+                .andExpect(ERROR_MATCHER.contentJson(ERROR_INFO_CREATE));
     }
 
     @Test

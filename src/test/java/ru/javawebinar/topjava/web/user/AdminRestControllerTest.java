@@ -5,12 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
-
-import javax.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -96,16 +96,16 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void updateDuplicateMail() {
+    @Transactional(propagation = Propagation.NEVER)
+    void updateDuplicateMail() throws Exception {
         User updated = getUpdated();
         updated.setEmail("admin@gmail.com");
-        assertThrows(PersistenceException.class, () -> {
-             perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .with(userHttpBasic(admin))
-                    .content(jsonWithPassword(updated, updated.getPassword())))
-                    .andDo(result -> em.flush());
-        });
+        perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content(jsonWithPassword(updated, updated.getPassword())))
+                .andExpect(status().isConflict())
+                .andExpect(ERROR_MATCHER.contentJson(ERROR_INFO_UPDATE_ADMIN));
     }
 
     @Test
@@ -148,16 +148,16 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void createDuplicateMail() {
+    @Transactional(propagation = Propagation.NEVER)
+    void createDuplicateMail() throws Exception {
         User newUser = getNew();
         newUser.setEmail("admin@gmail.com");
-        assertThrows(PersistenceException.class, () -> {
-            perform(MockMvcRequestBuilders.post(REST_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .with(userHttpBasic(admin))
-                    .content(jsonWithPassword(newUser, newUser.getPassword())))
-                    .andDo(result -> em.flush());
-        });
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content(jsonWithPassword(newUser, newUser.getPassword())))
+                .andExpect(status().isConflict())
+                .andExpect(ERROR_MATCHER.contentJson(ERROR_INFO_CREATE_ADMIN));
     }
 
     @Test
