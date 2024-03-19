@@ -32,8 +32,7 @@
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="true">${pageContext.response.locale}</button>
         <div class="dropdown-menu dropdown-menu-sm-right">
-            <script> const currentUrl = window.location.href </script>
-            <a class="dropdown-item" href=${pageContext.request.contextPath}?lang=en><spring:message code="common.english"/></a>
+            <a class="dropdown-item" href="${pageContext.request.contextPath}?lang=en"><spring:message code="common.english"/></a>
             <a class="dropdown-item" href="${pageContext.request.contextPath}?lang=ru"><spring:message code="common.russian"/></a>
         </div>
     </div>
