@@ -2,6 +2,8 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,12 +23,19 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+
+import java.util.Locale;
+
 import static ru.javawebinar.topjava.util.ValidationUtil.*;
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
 @RestControllerAdvice(annotations = RestController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
 public class ExceptionInfoHandler {
+
+    @Autowired
+    private MessageSource messageSource;
+
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
     //  http://stackoverflow.com/a/22358422/548473
@@ -39,23 +48,19 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        return checkDuplicateParameter(e, "users", "email") ?
-                new ErrorInfo(req.getRequestURL(), DUPLICATE_MAIL_ERROR, "User with this email already exists") :
-                checkDuplicateParameter(e, "meal", "date_time") ?
-                        new ErrorInfo(req.getRequestURL(), DUPLICATE_DATETIME_ERROR, "Meal with this datetime already exists") :
-                        logAndGetErrorInfo(req, e, true, DATA_ERROR);
+        return specifyErrorInfoDetails(e, logAndGetErrorInfo(req, e, true, DATA_ERROR));
     }
 
-    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422 to UI
-    @ExceptionHandler(BindException.class)
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     public ErrorInfo bindingError(HttpServletRequest req, BindException e) {
-        logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
-        return errorInfoToUI(req, VALIDATION_ERROR, getErrorResponse(e));
+        ErrorInfo errorInfo = logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
+        errorInfo.setDetails(getErrorResponse(e));
+        return errorInfo;
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalRequestDataException.class,
-            MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({IllegalRequestDataException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ErrorInfo validationError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
@@ -64,6 +69,16 @@ public class ExceptionInfoHandler {
     @ExceptionHandler(Exception.class)
     public ErrorInfo internalError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
+    }
+
+    private ErrorInfo specifyErrorInfoDetails(DataIntegrityViolationException e, ErrorInfo errorInfo) {
+        if (containsStrings(e, "users", "email")) {
+            errorInfo.setDetails(messageSource.getMessage("error.duplicateMail", null, Locale.getDefault()));
+        }
+        if (containsStrings(e, "meal", "date_time")) {
+            errorInfo.setDetails(messageSource.getMessage("error.duplicateDateTime", null, Locale.getDefault()));
+        }
+        return errorInfo;
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
@@ -75,9 +90,5 @@ public class ExceptionInfoHandler {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
         return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
-    }
-
-    private static ErrorInfo errorInfoToUI(HttpServletRequest req, ErrorType errorType, String message) {
-        return new ErrorInfo(req.getRequestURL(), errorType, message);
     }
 }

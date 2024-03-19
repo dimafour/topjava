@@ -9,7 +9,7 @@
     i18n["editTitle"] = '<spring:message code="${param.page}.edit"/>';
 
     <c:forEach var='key' items='${["common.deleted", "common.saved", "common.enabled", "common.disabled", "common.errorStatus",
-    "common.confirm", "APP_ERROR", "DATA_NOT_FOUND", "DATA_ERROR", "VALIDATION_ERROR", "DUPLICATE_MAIL_ERROR", "DUPLICATE_DATETIME_ERROR"]}'>
+    "common.confirm", "errorInfo.app", "errorInfo.dataNotFound", "errorInfo.data", "errorInfo.validation"]}'>
     i18n['${key}'] = '<spring:message code="${key}"/>';
     </c:forEach>
 </script>

@@ -5,17 +5,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
-import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.validation.Valid;
+
+import static ru.javawebinar.topjava.util.ValidationUtil.containsStrings;
 
 @Controller
 @RequestMapping("/profile")
@@ -68,11 +67,11 @@ public class ProfileUIController extends AbstractUserController {
         }
     }
 
-    private static void addErrorToResult(BindingResult result, DataIntegrityViolationException e) {
-        if (ValidationUtil.checkDuplicateParameter(e, "users", "email")) {
-            result.addError(new FieldError("userTo", "email", "User with this email already exists"));
+    private void addErrorToResult(BindingResult result, DataIntegrityViolationException e) {
+        if (containsStrings(e, "users", "email")) {
+            result.rejectValue("email", "error.duplicateMail");
         } else {
-            result.addError(new ObjectError("userTo", ValidationUtil.getRootCause(e).getMessage()));
+            throw new RuntimeException(e);
         }
     }
 }

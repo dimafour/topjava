@@ -12,7 +12,6 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import javax.persistence.PersistenceException;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -85,7 +84,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void updateDuplicateDateTime() throws Exception {
         Meal updated = getUpdated();
-        updated.setDateTime(LocalDateTime.parse("2020-01-31T20:00"));
+        updated.setDateTime(meal5.getDateTime());
         assertThrows(PersistenceException.class, () -> {
             perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
                     .with(userHttpBasic(user))
@@ -124,7 +123,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void createDuplicateDateTime() throws Exception {
         Meal newMeal = getNew();
-        newMeal.setDateTime(LocalDateTime.parse("2020-01-31T20:00"));
+        newMeal.setDateTime(meal5.getDateTime());
         assertThrows(PersistenceException.class, () -> {
             perform(MockMvcRequestBuilders.post(REST_URL)
                     .contentType(MediaType.APPLICATION_JSON)

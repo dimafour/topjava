@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.util;
 
 
 import org.springframework.core.NestedExceptionUtils;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.BindException;
 import ru.javawebinar.topjava.HasId;
@@ -10,8 +9,8 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.*;
+import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
@@ -77,15 +76,16 @@ public class ValidationUtil {
         return rootCause != null ? rootCause : t;
     }
 
-    public static String getErrorResponse(BindException e) {
+    public static String[] getErrorResponse(BindException e) {
         return e.getBindingResult().getFieldErrors().stream()
                 .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                .collect(Collectors.joining("<br>"));
+                .toList()
+                .toArray(new String[0]);
     }
 
-    public static boolean checkDuplicateParameter(DataIntegrityViolationException e, String tableName, String param) {
+    public static boolean containsStrings(Throwable e, String... fragments) {
         String message = getRootCause(e).getMessage();
-        return message != null && message.contains(tableName) && message.contains(param);
+        return message != null && Arrays.stream(fragments).allMatch(message::contains);
     }
 
 }
