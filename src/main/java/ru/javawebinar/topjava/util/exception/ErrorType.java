@@ -7,6 +7,7 @@ public enum ErrorType {
     VALIDATION_ERROR("errorInfo.validation");
 
     private final String code;
+
     ErrorType(String code) {
         this.code = code;
     }

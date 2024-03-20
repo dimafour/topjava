@@ -79,12 +79,10 @@ public class ValidationUtil {
     public static String[] getErrorResponse(BindException e) {
         return e.getBindingResult().getFieldErrors().stream()
                 .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                .toList()
-                .toArray(new String[0]);
+                .toArray(String[]::new);
     }
 
-    public static boolean containsStrings(Throwable e, String... fragments) {
-        String message = getRootCause(e).getMessage();
+    public static boolean containsStrings(String message, String... fragments) {
         return message != null && Arrays.stream(fragments).allMatch(message::contains);
     }
 

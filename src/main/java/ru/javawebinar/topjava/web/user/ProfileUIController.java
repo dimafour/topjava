@@ -68,7 +68,7 @@ public class ProfileUIController extends AbstractUserController {
     }
 
     private void addErrorToResult(BindingResult result, DataIntegrityViolationException e) {
-        if (containsStrings(e, "users", "email")) {
+        if (containsStrings(e.getRootCause().getMessage(), "users", "email")) {
             result.rejectValue("email", "error.duplicateMail");
         } else {
             throw new RuntimeException(e);

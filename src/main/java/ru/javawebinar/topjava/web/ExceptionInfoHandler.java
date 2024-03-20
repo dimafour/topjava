@@ -23,7 +23,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+import java.util.Arrays;
 import java.util.Locale;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.*;
@@ -48,15 +48,20 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        return specifyErrorInfoDetails(e, logAndGetErrorInfo(req, e, true, DATA_ERROR));
+        String message = getRootCause(e).getMessage();
+        if (containsStrings(message, "users", "email")) {
+            return logAndGetErrorInfo(req, DATA_ERROR, messageSource.getMessage("error.duplicateMail", null, Locale.getDefault()));
+        }
+        if (containsStrings(message, "meal", "date_time")) {
+            return logAndGetErrorInfo(req, DATA_ERROR, messageSource.getMessage("error.duplicateDateTime", null, Locale.getDefault()));
+        }
+        return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     public ErrorInfo bindingError(HttpServletRequest req, BindException e) {
-        ErrorInfo errorInfo = logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
-        errorInfo.setDetails(getErrorResponse(e));
-        return errorInfo;
+        return logAndGetErrorInfo(req, VALIDATION_ERROR, getErrorResponse(e));
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
@@ -71,16 +76,6 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
     }
 
-    private ErrorInfo specifyErrorInfoDetails(DataIntegrityViolationException e, ErrorInfo errorInfo) {
-        if (containsStrings(e, "users", "email")) {
-            errorInfo.setDetails(messageSource.getMessage("error.duplicateMail", null, Locale.getDefault()));
-        }
-        if (containsStrings(e, "meal", "date_time")) {
-            errorInfo.setDetails(messageSource.getMessage("error.duplicateDateTime", null, Locale.getDefault()));
-        }
-        return errorInfo;
-    }
-
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = getRootCause(e);
@@ -89,6 +84,11 @@ public class ExceptionInfoHandler {
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
+    }
+
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, ErrorType errorType, String... messages) {
+        log.error(errorType + " at request " + req.getRequestURL() + ": {}", Arrays.toString(messages));
+        return new ErrorInfo(req.getRequestURL(), errorType, messages);
     }
 }

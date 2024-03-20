@@ -9,7 +9,7 @@ public class ErrorInfo {
     private final String url;
     private final ErrorType type;
     private final String code;
-    private List<String> details;
+    private final List<String> details;
 
     @ConstructorProperties({"url", "type", "details"})
     public ErrorInfo(CharSequence url, ErrorType type, String... details) {
@@ -21,10 +21,6 @@ public class ErrorInfo {
 
     public void addDetail(String detail) {
         details.add(detail);
-    }
-
-    public void setDetails(String... details) {
-        this.details = new ArrayList<>(List.of(details));
     }
 
     public List<String> getDetails() {
