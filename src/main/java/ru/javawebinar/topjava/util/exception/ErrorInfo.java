@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.util.exception;
 
 import java.beans.ConstructorProperties;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,11 +15,7 @@ public class ErrorInfo {
         this.url = url.toString();
         this.type = type;
         this.code = type.getCode();
-        this.details = new ArrayList<>(List.of(details));
-    }
-
-    public void addDetail(String detail) {
-        details.add(detail);
+        this.details = List.of(details);
     }
 
     public List<String> getDetails() {

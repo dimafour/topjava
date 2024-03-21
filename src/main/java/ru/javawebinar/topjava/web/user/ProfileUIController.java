@@ -15,6 +15,7 @@ import ru.javawebinar.topjava.web.SecurityUtil;
 import javax.validation.Valid;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.containsStrings;
+import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 
 @Controller
 @RequestMapping("/profile")
@@ -68,7 +69,7 @@ public class ProfileUIController extends AbstractUserController {
     }
 
     private void addErrorToResult(BindingResult result, DataIntegrityViolationException e) {
-        if (containsStrings(e.getRootCause().getMessage(), "users", "email")) {
+        if (containsStrings(getRootCause(e).getMessage(), "users", "email")) {
             result.rejectValue("email", "error.duplicateMail");
         } else {
             throw new RuntimeException(e);

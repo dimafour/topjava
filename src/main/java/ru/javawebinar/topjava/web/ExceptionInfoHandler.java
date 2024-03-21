@@ -23,7 +23,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.*;
@@ -50,10 +49,10 @@ public class ExceptionInfoHandler {
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
         String message = getRootCause(e).getMessage();
         if (containsStrings(message, "users", "email")) {
-            return logAndGetErrorInfo(req, DATA_ERROR, messageSource.getMessage("error.duplicateMail", null, Locale.getDefault()));
+            return logAndGetErrorInfo(req, e, true, DATA_ERROR, messageSource.getMessage("error.duplicateMail", null, Locale.getDefault()));
         }
         if (containsStrings(message, "meal", "date_time")) {
-            return logAndGetErrorInfo(req, DATA_ERROR, messageSource.getMessage("error.duplicateDateTime", null, Locale.getDefault()));
+            return logAndGetErrorInfo(req, e, true, DATA_ERROR, messageSource.getMessage("error.duplicateDateTime", null, Locale.getDefault()));
         }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
@@ -61,7 +60,7 @@ public class ExceptionInfoHandler {
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     public ErrorInfo bindingError(HttpServletRequest req, BindException e) {
-        return logAndGetErrorInfo(req, VALIDATION_ERROR, getErrorResponse(e));
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, getErrorResponse(e));
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
@@ -77,18 +76,15 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, String... messages) {
         Throwable rootCause = getRootCause(e);
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
-    }
-
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, ErrorType errorType, String... messages) {
-        log.error(errorType + " at request " + req.getRequestURL() + ": {}", Arrays.toString(messages));
-        return new ErrorInfo(req.getRequestURL(), errorType, messages);
+        return messages == null ?
+                new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage()) :
+                new ErrorInfo(req.getRequestURL(), errorType, messages);
     }
 }
